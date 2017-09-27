@@ -13,6 +13,8 @@ import com.wilddog.wilddogauth.core.Task;
 import com.wilddog.wilddogauth.core.listener.OnCompleteListener;
 import com.wilddog.wilddogauth.core.result.AuthResult;
 
+import cn.lltw.nodelist.error.ErrorHandler;
+
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
@@ -39,7 +41,8 @@ public class LoginActivity extends AppCompatActivity {
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loginWithEmail();
+                if(validate())
+                    loginWithEmail();
             }
         });
 
@@ -61,17 +64,35 @@ public class LoginActivity extends AppCompatActivity {
 
         wilddogAuth.signInWithEmailAndPassword(login_email,login_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onComplete(Task<AuthResult> var1) {
-                if(var1.isSuccessful()){
+            public void onComplete(Task<AuthResult> task) {
+                if(task.isSuccessful()){
                     //跳转到MainActivity
-                    Toast.makeText(LoginActivity.this,"Login as:"+var1.getResult().getWilddogUser().getDisplayName(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this,"Login as:"+task.getResult().getWilddogUser().getDisplayName(),Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                     startActivity(intent);
                 }else{
                     //判断错误并弹出Toast提示
-                    Toast.makeText(LoginActivity.this,"Login Failed:"+var1.getException().toString(),Toast.LENGTH_SHORT).show();
+                    String errorCode=task.getException().toString().substring(9,14);
+                    Toast.makeText(LoginActivity.this, ErrorHandler.convertErrorCode(errorCode),Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private boolean validate()
+    {
+        boolean validateResult=true;
+        //邮箱非空验证
+        if(email_edit.getText().toString().equals("")){
+            email_edit.setError(email_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+        //输入密码非空验证
+        if(password_edit.getText().toString().equals("")){
+            password_edit.setError(password_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+
+        return validateResult;
     }
 }

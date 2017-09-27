@@ -22,6 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = "RegisterActivity";
     private EditText register_email_edit;
     private EditText register_password_edit;
+    private EditText register_password_confirm_edit;
     private EditText register_display_name_edit;
     private Button register_btn;
 
@@ -38,13 +39,15 @@ public class RegisterActivity extends AppCompatActivity {
 
         register_email_edit=(EditText)findViewById(R.id.reg_email);
         register_password_edit=(EditText)findViewById(R.id.reg_password);
+        register_password_confirm_edit=(EditText)findViewById(R.id.reg_confirm_password);
         register_display_name_edit=(EditText)findViewById(R.id.reg_display_name);
         register_btn=(Button)findViewById(R.id.register_btn);
 
         register_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                registerWithEmail();
+                if(validate())
+                    registerWithEmail();
             }
         });
     }
@@ -68,7 +71,6 @@ public class RegisterActivity extends AppCompatActivity {
                             Toast.makeText(RegisterActivity.this,"Login as:"+user.getDisplayName(),Toast.LENGTH_SHORT).show();
                             backToMain();
                         }else{
-                            //TODO:获取错误并弹出Toast提示[网络错误][email已被注册][密码]
                             //这里的Exception不需要抛出
                             String errorCode=task.getException().toString().substring(9,14);
                             Toast.makeText(RegisterActivity.this, ErrorHandler.convertErrorCode(errorCode),Toast.LENGTH_SHORT).show();
@@ -82,4 +84,31 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private boolean validate(){
+        boolean validateResult=true;
+        //非空验证
+        if(register_email_edit.getText().toString().equals("")){
+            register_email_edit.setError(register_email_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+        if(register_display_name_edit.getText().toString().equals("")){
+            register_display_name_edit.setError(register_display_name_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+        if(register_password_edit.getText().toString().equals("")){
+            register_password_edit.setError(register_password_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+        if(register_password_confirm_edit.getText().toString().equals("")){
+            register_password_confirm_edit.setError(register_password_confirm_edit.getHint()+"不能为空");
+            validateResult=false;
+        }
+        //重复输入密码匹配验证
+        if(!register_password_edit.getText().toString().equals(register_password_confirm_edit.getText().toString())){
+            register_password_confirm_edit.setError("确认密码不匹配");
+            validateResult=false;
+        }
+        return validateResult;
+
+    }
 }
