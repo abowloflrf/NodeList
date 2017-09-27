@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,12 +24,11 @@ import com.wilddog.wilddogauth.WilddogAuth;
 import com.wilddog.wilddogauth.model.WilddogUser;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "MainActivity";
     WilddogAuth auth;
     WilddogUser user;
-    TextView main_text;
     ImageView avatar_view;
     TextView nav_email;
     TextView nav_username;
@@ -43,13 +45,7 @@ public class MainActivity extends AppCompatActivity
 
         //首页浮动按钮点击事件，用户添加新的清单
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         //实例化Drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -61,6 +57,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_login_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //默认选择第一项
+        if(savedInstanceState==null){
+            navigationView.setCheckedItem(R.id.nav_list);
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
+        }
         //获取导航头部
         View navigationHeaderView=navigationView.getHeaderView(0);
 
@@ -69,7 +70,6 @@ public class MainActivity extends AppCompatActivity
 
 
         avatar_view = (ImageView)navigationHeaderView.findViewById(R.id.nav_header_avatar);
-        main_text=(TextView)findViewById(R.id.main_text);
         nav_email=(TextView)navigationHeaderView.findViewById(R.id.nav_header_email);
         nav_username=(TextView)navigationHeaderView.findViewById(R.id.nav_header_username);
 
@@ -91,7 +91,14 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             menu.removeGroup(R.id.nav_account_group);
-            Toast.makeText(MainActivity.this,"请登陆",Toast.LENGTH_SHORT).show();
+            //为点击FAB添加事件
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "请先登陆！", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
         }
 
 
@@ -139,19 +146,35 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Fragment fragment=null;
+        Class fragmentClass=null;
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if(id==R.id.nav_logout){
+        if (id == R.id.nav_list) {
+            fragmentClass=ListFragment.class;
+        } else if (id == R.id.nav_ground) {
+            fragmentClass=GroundFragment.class;
+        } else if (id == R.id.nav_graph) {
+            fragmentClass=GraphFragment.class;
+        } else if (id == R.id.nav_profile) {
+            fragmentClass=ProfileFragment.class;
+        } else if (id == R.id.nav_setting) {
+            fragmentClass=SettingFragment.class;
+        } else if (id == R.id.nav_logout) {
             logout();
+            fragmentClass=ListFragment.class;
+        }else{
+            fragmentClass=ListFragment.class;
         }
 
+        try{
+            fragment=(Fragment)fragmentClass.newInstance();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        setTitle(item.getTitle());
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.main_content,fragment).commit();
+        //点击之后关闭Drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -162,7 +185,6 @@ public class MainActivity extends AppCompatActivity
         String username=user.getDisplayName();
         String email=user.getEmail();
         String uid=user.getUid();
-        main_text.setText("Welcome:"+username);
         nav_username.setText(username);
         nav_email.setText(email);
 

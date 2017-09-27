@@ -4,33 +4,33 @@
     <group android:checkableBehavior="single"
         android:id="@+id/nav_main_group">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import"/>
+            android:id="@+id/nav_list"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Node List"/>
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery"/>
+            android:id="@+id/nav_ground"
+            android:icon="@drawable/ic_menu_ground"
+            android:title="清单广场"/>
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow"/>
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools"/>
+            android:id="@+id/nav_graph"
+            android:icon="@drawable/ic_menu_graph"
+            android:title="效率统计"/>
     </group>
 
     <group android:checkableBehavior="single"
         android:id="@+id/nav_account_group">
             <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_menu_profile"
+                android:title="个人信息"/>
+            <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_menu_setting"
-                android:title="Setting"/>
+                android:title="设置"/>
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_menu_logout"
-                android:title="Logout"/>
+                android:title="注销"/>
     </group>
 
 </menu>
