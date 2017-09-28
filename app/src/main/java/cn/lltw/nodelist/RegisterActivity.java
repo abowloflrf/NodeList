@@ -68,6 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
                             UserProfileChangeRequest profileChangeRequest=new UserProfileChangeRequest.Builder()
                                     .setDisplayName(display_name).build();
                             user.updateProfile(profileChangeRequest);
+                            //TODO:写入用户信息到SharedPreference
                             Toast.makeText(RegisterActivity.this,"Login as:"+user.getDisplayName(),Toast.LENGTH_SHORT).show();
                             backToMain();
                         }else{

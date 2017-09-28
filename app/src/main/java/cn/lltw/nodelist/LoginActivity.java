@@ -18,18 +18,18 @@ import cn.lltw.nodelist.error.ErrorHandler;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
-    private WilddogAuth wilddogAuth;
-    private EditText email_edit;
-    private EditText password_edit;
-    private Button login_btn;
-    private Button register_btn;
+    WilddogAuth wilddogAuth;
+    EditText email_edit;
+    EditText password_edit;
+    Button login_btn;
+    Button register_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //注册布局组件
+        //布局组件
         email_edit=(EditText) findViewById(R.id.email);
         password_edit=(EditText) findViewById(R.id.password);
         login_btn=(Button) findViewById(R.id.login_btn);
@@ -45,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
                     loginWithEmail();
             }
         });
-
 
         //点击注册按钮事件进入到RegisterActivity
         register_btn.setOnClickListener(new View.OnClickListener() {
@@ -66,10 +65,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    //TODO:这里读取user个人信息并写入到SharedPreference
                     //跳转到MainActivity
                     Toast.makeText(LoginActivity.this,"Login as:"+task.getResult().getWilddogUser().getDisplayName(),Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                     startActivity(intent);
+
                 }else{
                     //判断错误并弹出Toast提示
                     String errorCode=task.getException().toString().substring(9,14);
@@ -79,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    //登陆表单验证
     private boolean validate()
     {
         boolean validateResult=true;

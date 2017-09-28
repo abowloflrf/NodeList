@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity
     ImageView avatar_view;
     TextView nav_email;
     TextView nav_username;
+    FloatingActionButton fab;
+    Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //首页浮动按钮点击事件，用户添加新的清单
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
 
         //实例化Drawer
@@ -65,44 +67,25 @@ public class MainActivity extends AppCompatActivity
         //获取导航头部
         View navigationHeaderView=navigationView.getHeaderView(0);
 
-        Menu menu=navigationView.getMenu();
-
-
+        menu=navigationView.getMenu();
 
         avatar_view = (ImageView)navigationHeaderView.findViewById(R.id.nav_header_avatar);
         nav_email=(TextView)navigationHeaderView.findViewById(R.id.nav_header_email);
         nav_username=(TextView)navigationHeaderView.findViewById(R.id.nav_header_username);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         auth=WilddogAuth.getInstance();
         user=auth.getCurrentUser();
         //判断是否登陆
         if(user!=null){
             initialLoginView();
-            //移除logout按钮
-
         }else{
-            //判断为没有登陆
-            //TODO:修改为case写法点击头像图片以及下面的TextView都跳转到LoginActivity
-            avatar_view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(MainActivity.this,LoginActivity.class);
-                    startActivity(intent);
-                }
-            });
-            menu.removeGroup(R.id.nav_account_group);
-            //为点击FAB添加事件
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "请先登陆！", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
+            initialNotLoginView();
         }
-
-
-
     }
 
     //点击返回关闭Drawer
@@ -185,10 +168,32 @@ public class MainActivity extends AppCompatActivity
         String username=user.getDisplayName();
         String email=user.getEmail();
         String uid=user.getUid();
+        Log.d(TAG, "initialLoginView: username:"+username+" email:"+email);
         nav_username.setText(username);
         nav_email.setText(email);
+        //TODO:将野狗中的个人信息（用户名，邮箱，等）存入SharedPreference中
+    }
 
-
+    private void initialNotLoginView(){
+        //判断为没有登陆
+        //TODO:修改为case写法点击头像图片以及下面的TextView都跳转到LoginActivity
+        avatar_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+        //移除Drawer中用户操作部分菜单
+        menu.removeGroup(R.id.nav_account_group);
+        //为点击FAB添加事件
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "请先登陆！", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     private void logout()
