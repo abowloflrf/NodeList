@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         //默认选择第一项
         if(savedInstanceState==null){
             navigationView.setCheckedItem(R.id.nav_list);
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
+            getFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
         }
         //获取导航头部
         View navigationHeaderView=navigationView.getHeaderView(0);
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         setTitle(item.getTitle());
-        FragmentManager fragmentManager=getSupportFragmentManager();
+        FragmentManager fragmentManager=getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.main_content,fragment).commit();
         //点击之后关闭Drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
