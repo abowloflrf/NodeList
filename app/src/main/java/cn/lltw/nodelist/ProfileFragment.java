@@ -46,7 +46,6 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
         username=(EditTextPreference)getPreferenceScreen().findPreference("profile_username");
         email=(EditTextPreference)getPreferenceScreen().findPreference("profile_email");
         password=(EditTextPreference)getPreferenceScreen().findPreference("profile_password");
-
     }
 
         @Override

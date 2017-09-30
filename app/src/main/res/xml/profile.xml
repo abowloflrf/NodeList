@@ -3,18 +3,22 @@
     <ListPreference
         android:key="profile_avatar"
         android:title="更改头像"
+        android:icon="@drawable/ic_profile_avatar"
         android:entries="@array/avatar_choose"
         android:entryValues="@array/avatar_choose_values"/>
     <EditTextPreference
         android:key="profile_username"
         android:title="更改用户名"
+        android:icon="@drawable/ic_profile_username"
         android:dialogTitle="更改用户名"/>
     <EditTextPreference
         android:key="profile_email"
         android:title="更改邮箱"
+        android:icon="@drawable/ic_profile_email"
         android:dialogTitle="更改邮箱"/>
     <EditTextPreference
         android:key="profile_password"
         android:title="更改密码"
+        android:icon="@drawable/ic_profile_password"
         android:dialogTitle="更改密码"/>
 </PreferenceScreen>
