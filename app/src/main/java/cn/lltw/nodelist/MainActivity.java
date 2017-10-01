@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         //默认选择第一项
         if(savedInstanceState==null){
             navigationView.setCheckedItem(R.id.nav_list);
-            getFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
+            getFragmentManager().beginTransaction().replace(R.id.main_content,new BlankFragment()).commit();
         }
         //获取导航头部
         View navigationHeaderView=navigationView.getHeaderView(0);
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            getFragmentManager().beginTransaction().replace(R.id.main_content,new SettingFragment()).commit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity
             logout();
             fragmentClass=ListFragment.class;
         }else{
-            fragmentClass=ListFragment.class;
+            fragmentClass=BlankFragment.class;
         }
 
         try{
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "initialLoginView: username:"+username+" email:"+email);
         nav_username.setText(username);
         nav_email.setText(email);
+        getFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
         //TODO:将野狗中的个人信息（用户名，邮箱，等）存入SharedPreference中
     }
 
@@ -184,14 +186,15 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-        //移除Drawer中用户操作部分菜单
+        //移除Drawer中菜单
         menu.removeGroup(R.id.nav_account_group);
-        //为点击FAB添加事件
-        fab.setOnClickListener(new View.OnClickListener() {
+        menu.removeGroup(R.id.nav_main_group);
+        Button button=(Button)findViewById(R.id.goto_login_btn);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "请先登陆！", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i=new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(i);
             }
         });
     }
