@@ -11,6 +11,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wilddog.client.SyncError;
+import com.wilddog.client.SyncReference;
+import com.wilddog.client.WilddogSync;
+import com.wilddog.wilddogauth.WilddogAuth;
+import com.wilddog.wilddogauth.model.WilddogUser;
+
 import java.util.List;
 
 import cn.lltw.nodelist.Model.NodeList;
@@ -54,8 +60,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         holder.nodelistView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View view) {
-                int position=holder.getAdapterPosition();
+                final int position=holder.getAdapterPosition();
                 final NodeList list=mNodeList.get(position);
+                //TODO:考虑改成使用ContextMenu
                 PopupMenu popup=new PopupMenu(view.getContext(),holder.nodelistView);
                 popup.inflate(R.menu.delete_list);
                 popup.show();
@@ -64,8 +71,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()){
                             case R.id.popup_delete_list:
-                                //TODO:完成deleteList()
-                                Toast.makeText(view.getContext(), "删除："+list.getName(), Toast.LENGTH_SHORT).show();
+                                //从远程数据库中删除清单
+                                deleteList(list.getKey(),position);
+                                //更新界面移除清单item
+                                mNodeList.remove(position);
+                                notifyDataSetChanged();
+                                Toast.makeText(view.getContext(), "删除成功："+list.getKey(), Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         return true;
@@ -88,5 +99,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return mNodeList.size();
+    }
+
+    private void deleteList(String key, final int position){
+        WilddogAuth auth=WilddogAuth.getInstance();
+        WilddogUser user=auth.getCurrentUser();
+        String uid=user.getUid();
+        SyncReference ref= WilddogSync.getInstance().getReference("users/"+uid+"/lists/"+key);
+        ref.removeValue();
     }
 }

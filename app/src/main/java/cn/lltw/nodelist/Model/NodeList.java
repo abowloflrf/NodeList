@@ -6,12 +6,14 @@ package cn.lltw.nodelist.Model;
  */
 
 public class NodeList {
+    private String key;
     private String name;
     private String describe;
 
-    public NodeList(String name, String describe) {
+    public NodeList(String name, String describe, String key) {
         this.name = name;
         this.describe = describe;
+        this.key=key;
     }
 
     public String getName() {
@@ -30,4 +32,7 @@ public class NodeList {
         this.describe = describe;
     }
 
+    public String getKey() {
+        return key;
+    }
 }

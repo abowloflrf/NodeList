@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -66,12 +67,11 @@ public class ListFragment extends Fragment {
                         DataSnapshot data=(DataSnapshot) iter.next();
                         String list_name=(String)data.child("name").getValue();
                         String list_describe=(String)data.child("describe").getValue();
-                        NodeList node_list=new NodeList(list_name,list_describe);
+                        String list_key=data.getKey();
+                        NodeList node_list=new NodeList(list_name,list_describe,list_key);
                         mNodeList.add(0,node_list);
-                        Log.d(TAG, "onDataChange: "+node_list.getName());
                     }
                     adapter.notifyDataSetChanged();
-
                 }
 
             }
@@ -123,13 +123,11 @@ public class ListFragment extends Fragment {
                 .show();
     }
 
-    public void createList(String name, final String des){
+    public void createList(final String name, final String des){
         //根据新建参数构造一个NodeList对象
-        final NodeList nodelist=new NodeList(name,des);
         HashMap<String,Object> list=new HashMap<>();
         list.put("name",name);
         list.put("describe",des);
-        //TODO:这里是使用Wilddog提供的push方法，默认新建一个节点时自动生成了一个key，不知道这样好不好操作，因为后面删除list时依据传入什么还不知道若要使用这个自动生成的key需要重写一些Nodelist对象构造的时候要传入这个key
         ref.push().setValue(list, new SyncReference.CompletionListener() {
             @Override
             public void onComplete(SyncError syncError, SyncReference syncReference) {
@@ -137,6 +135,8 @@ public class ListFragment extends Fragment {
                     Toast.makeText(getContext(), "Failed:"+syncError.getErrCode(), Toast.LENGTH_SHORT).show();
                 }else{
                     //将新建的NodeList对象添加到列表中并刷新recyclerview
+                    String key=syncReference.getKey();
+                    NodeList nodelist=new NodeList(name,des,key);
                     mNodeList.add(0,nodelist);
                     adapter.notifyDataSetChanged();
                 }
