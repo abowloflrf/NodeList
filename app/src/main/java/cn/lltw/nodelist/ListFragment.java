@@ -2,6 +2,7 @@ package cn.lltw.nodelist;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -37,6 +38,7 @@ import cn.lltw.nodelist.Model.NodeList;
  */
 public class ListFragment extends Fragment {
 
+    static int listSeq;
     View view;
     WilddogAuth auth;
     WilddogUser user;
@@ -45,6 +47,7 @@ public class ListFragment extends Fragment {
     List<NodeList> mNodeList=new ArrayList<>();
     ListAdapter adapter;
     FloatingActionButton fab;
+    Context mContext;
     private static final String TAG = "ListFragment";
     public ListFragment() {
         // Required empty public constructor
@@ -56,18 +59,22 @@ public class ListFragment extends Fragment {
         auth=WilddogAuth.getInstance();
         user=auth.getCurrentUser();
         uid=user.getUid();
+        mContext = getActivity();
         ref= WilddogSync.getInstance().getReference("users/"+uid+"/lists");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null){
                     Iterator iter=dataSnapshot.getChildren().iterator();
+                    listSeq = (int) dataSnapshot.getChildrenCount();
                     while (iter.hasNext()){
                         DataSnapshot data=(DataSnapshot) iter.next();
                         String list_name=(String)data.child("name").getValue();
                         String list_describe=(String)data.child("describe").getValue();
                         NodeList node_list=new NodeList(list_name,list_describe);
-                        mNodeList.add(0,node_list);
+
+                        //修改了添加的顺序
+                        mNodeList.add(node_list);
                         Log.d(TAG, "onDataChange: "+node_list.getName());
                     }
                     adapter.notifyDataSetChanged();
@@ -92,7 +99,7 @@ public class ListFragment extends Fragment {
         RecyclerView recyclerView=(RecyclerView)view.findViewById(R.id.list_recycler_view);
         LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter=new ListAdapter(mNodeList);
+        adapter=new ListAdapter(mContext, mNodeList);
         recyclerView.setAdapter(adapter);
         fab=(FloatingActionButton)view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,16 +136,21 @@ public class ListFragment extends Fragment {
         HashMap<String,Object> list=new HashMap<>();
         list.put("name",name);
         list.put("describe",des);
-        //TODO:这里是使用Wilddog提供的push方法，默认新建一个节点时自动生成了一个key，不知道这样好不好操作，因为后面删除list时依据传入什么还不知道若要使用这个自动生成的key需要重写一些Nodelist对象构造的时候要传入这个key
-        ref.push().setValue(list, new SyncReference.CompletionListener() {
+        //添加清单的序号为listSeq，回头可以自动索引
+        ref= WilddogSync.getInstance().getReference("users/"+uid+"/lists/" + listSeq);
+        //修改了添加清单的方式，避免了自动生成，使得清单的编号能够自己控制
+        ref.setValue(list, new SyncReference.CompletionListener() {
             @Override
             public void onComplete(SyncError syncError, SyncReference syncReference) {
                 if (syncError!=null){
                     Toast.makeText(getContext(), "Failed:"+syncError.getErrCode(), Toast.LENGTH_SHORT).show();
                 }else{
                     //将新建的NodeList对象添加到列表中并刷新recyclerview
-                    mNodeList.add(0,nodelist);
+
+                    //修改了添加的顺序-By WX
+                    mNodeList.add(nodelist);
                     adapter.notifyDataSetChanged();
+                    listSeq += 1;
                 }
             }
         });

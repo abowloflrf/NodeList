@@ -1,5 +1,8 @@
 package cn.lltw.nodelist;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -21,6 +24,7 @@ import cn.lltw.nodelist.Model.NodeList;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private List<NodeList> mNodeList;
+    private Context mContext;
     static class ViewHolder extends RecyclerView.ViewHolder{
         View nodelistView;
         TextView nodelistName;
@@ -32,7 +36,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             nodelistDescribe=(TextView)view.findViewById(R.id.list_card_describe);
         }
     }
-    public ListAdapter(List<NodeList> nodeList){
+    public ListAdapter(Context context, List<NodeList> nodeList){
+        mContext = context;
         mNodeList=nodeList;
     }
 
@@ -46,7 +51,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             public void onClick(View view) {
                 int position=holder.getAdapterPosition();
                 NodeList list=mNodeList.get(position);
-                //TODO:跳转到新的Activity以显示这个list下所有的task
+                //跳转到TaskActivity
+                Intent intent = new Intent(mContext, TaskActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("listName", list.getName());
+                bundle.putInt("listID", position);
+                intent.putExtras(bundle);
+                mContext.startActivity(intent);
                 Toast.makeText(view.getContext(), "你点击了"+list.getName(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -67,6 +78,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                                 //TODO:完成deleteList()
                                 Toast.makeText(view.getContext(), "删除："+list.getName(), Toast.LENGTH_SHORT).show();
                                 break;
+                            case R.id.popup_share_list:
+                                //TODO:完成shareList()
+                                Toast.makeText(view.getContext(), "分享："+list.getName(), Toast.LENGTH_SHORT).show();
                         }
                         return true;
                     }
@@ -89,4 +103,5 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public int getItemCount() {
         return mNodeList.size();
     }
+
 }

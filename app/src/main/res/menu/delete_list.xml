@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item
-    android:id="@+id/popup_delete_list"
-    android:title="删除"/>
+    <item android:id="@+id/popup_share_list"
+        android:title="分享"/>
+    <item
+        android:id="@+id/popup_delete_list"
+        android:title="删除"/>
 </menu>

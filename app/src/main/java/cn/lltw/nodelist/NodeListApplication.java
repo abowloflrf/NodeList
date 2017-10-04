@@ -15,6 +15,7 @@ public class NodeListApplication extends Application {
         super.onCreate();
         //初始化SDK
         WilddogOptions options=new WilddogOptions.Builder().setSyncUrl("https://wd8779608031iwumoc.wilddogio.com").build();
+//        WilddogOptions options=new WilddogOptions.Builder().setSyncUrl("https://wd2971316142gyhmdo.wilddogio.com/").build();
         WilddogApp wilddogApp=WilddogApp.initializeApp(this,options);
     }
 }
