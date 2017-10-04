@@ -9,7 +9,10 @@ import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wilddog.wilddogauth.WilddogAuth;
@@ -30,6 +33,11 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
     private EditTextPreference email;
     private EditTextPreference password;
 
+    NavigationView navigationView;
+    View navigationHeaderView;
+    TextView nav_username;
+    TextView nav_email;
+
     WilddogAuth auth;
     WilddogUser user;
 
@@ -46,6 +54,12 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
         username=(EditTextPreference)getPreferenceScreen().findPreference("profile_username");
         email=(EditTextPreference)getPreferenceScreen().findPreference("profile_email");
         password=(EditTextPreference)getPreferenceScreen().findPreference("profile_password");
+
+        navigationView=(NavigationView)getActivity().findViewById(R.id.nav_login_view);
+        navigationHeaderView=navigationView.getHeaderView(0);
+        nav_username=navigationHeaderView.findViewById(R.id.nav_header_username);
+        nav_email=navigationHeaderView.findViewById(R.id.nav_header_email);
+
     }
 
         @Override
@@ -60,6 +74,7 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
                     @Override
                     public void onComplete(Task<Void> task) {
                         if(task.isSuccessful()){
+                            nav_username.setText(username.getText());
                             Toast.makeText(getActivity(), "已修改用户名为："+username.getText(), Toast.LENGTH_SHORT).show();
                             username.setSummary(username.getText());
                         }else{
@@ -75,6 +90,7 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
                     @Override
                     public void onComplete(Task<Void> task) {
                         if(task.isSuccessful()){
+                            nav_email.setText(email.getText());
                             Toast.makeText(getActivity(), "已修改登陆邮箱为："+email.getText(), Toast.LENGTH_SHORT).show();
                             email.setSummary(email.getText());
                         }else{
@@ -102,22 +118,22 @@ public class ProfileFragment extends PreferenceFragment implements SharedPrefere
     public void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        //TODO:个人信息修改这儿有一个bug，成功修改信息之后本地SharedPreference与Wilddog.user获取到的用户名都是修改后的。但是退出应用再打开就显示为修改之前的
+//        //TODO:个人信息修改这儿有一个bug，成功修改信息之后本地SharedPreference与Wilddog.user获取到的用户名都是修改后的。但是退出应用再打开就显示为修改之前的
         auth=WilddogAuth.getInstance();
         user=auth.getCurrentUser();
-        if (user != null) {
-            Log.d(TAG, "onResume before: "+user.getDisplayName()+" email"+username.getText());
-            username.setText(user.getDisplayName());
+//        if (user != null) {
+//            Log.d(TAG, "onResume before: "+user.getDisplayName()+" email"+username.getText());
+//            username.setText(user.getDisplayName());
             username.setSummary(username.getText());
-            email.setText(user.getEmail());
+//            email.setText(user.getEmail());
             email.setSummary(email.getText());
-            Log.d(TAG, "onResume after:"+user.getDisplayName()+" email:"+username.getText());
-            //TODO:头像，先不管
+//            Log.d(TAG, "onResume after:"+user.getDisplayName()+" email:"+username.getText());
+//            //TODO:头像，先不管
             avatar.setSummary(avatar.getEntry());
-        } else {
-            Toast.makeText(getActivity(), "请登陆！", Toast.LENGTH_SHORT).show();
-            Intent intent =new Intent(getContext(),LoginActivity.class);
-            startActivity(intent);
-        }
+//        } else {
+//            Toast.makeText(getActivity(), "请登陆！", Toast.LENGTH_SHORT).show();
+//            Intent intent =new Intent(getContext(),LoginActivity.class);
+//            startActivity(intent);
+//        }
     }
 }

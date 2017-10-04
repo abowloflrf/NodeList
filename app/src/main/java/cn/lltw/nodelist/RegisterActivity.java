@@ -1,6 +1,7 @@
 package cn.lltw.nodelist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -68,8 +69,14 @@ public class RegisterActivity extends AppCompatActivity {
                             UserProfileChangeRequest profileChangeRequest=new UserProfileChangeRequest.Builder()
                                     .setDisplayName(display_name).build();
                             user.updateProfile(profileChangeRequest);
-                            //TODO:写入用户信息到SharedPreference
-                            Toast.makeText(RegisterActivity.this,"Login as:"+user.getDisplayName(),Toast.LENGTH_SHORT).show();
+
+                            //写入用户信息到SharedPreference
+                            SharedPreferences.Editor editor=getSharedPreferences("cn.lltw.nodelist_preferences",MODE_PRIVATE).edit();
+                            editor.putString("profile_username",display_name);
+                            editor.putString("profile_email",user.getEmail());
+                            editor.apply();
+
+                            Toast.makeText(RegisterActivity.this,"Login as:"+display_name,Toast.LENGTH_SHORT).show();
                             backToMain();
                         }else{
                             //这里的Exception不需要抛出

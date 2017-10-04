@@ -1,6 +1,7 @@
 package cn.lltw.nodelist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.wilddog.wilddogauth.WilddogAuth;
 import com.wilddog.wilddogauth.core.Task;
 import com.wilddog.wilddogauth.core.listener.OnCompleteListener;
 import com.wilddog.wilddogauth.core.result.AuthResult;
+import com.wilddog.wilddogauth.model.WilddogUser;
 
 import cn.lltw.nodelist.error.ErrorHandler;
 
@@ -19,6 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
     WilddogAuth wilddogAuth;
+    WilddogUser wilddogUser;
     EditText email_edit;
     EditText password_edit;
     Button login_btn;
@@ -65,7 +68,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    //TODO:这里读取user个人信息并写入到SharedPreference
+                    wilddogUser=wilddogAuth.getCurrentUser();
+                    //将野狗中的个人信息（用户名，邮箱，等）存入SharedPreference中
+                    SharedPreferences.Editor editor=getSharedPreferences("cn.lltw.nodelist_preferences",MODE_PRIVATE).edit();
+                    editor.putString("profile_username",wilddogUser.getDisplayName());
+                    editor.putString("profile_email",wilddogUser.getEmail());
+                    editor.apply();
                     //跳转到MainActivity
                     Toast.makeText(LoginActivity.this,"Login as:"+task.getResult().getWilddogUser().getDisplayName(),Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent(LoginActivity.this,MainActivity.class);

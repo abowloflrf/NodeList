@@ -1,6 +1,7 @@
 package cn.lltw.nodelist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity
             fragmentClass=SettingFragment.class;
         } else if (id == R.id.nav_logout) {
             logout();
-            fragmentClass=ListFragment.class;
+            fragmentClass=BlankFragment.class;
         }else{
             fragmentClass=BlankFragment.class;
         }
@@ -166,19 +167,22 @@ public class MainActivity extends AppCompatActivity
 
     private void initialLoginView(){
         //判断为已经登陆则重写一些界面
-        String username=user.getDisplayName();
-        String email=user.getEmail();
-        String uid=user.getUid();
-        Log.d(TAG, "initialLoginView: username:"+username+" email:"+email);
+
+        //从SharedPreference中获取用户信息并展示
+        SharedPreferences preferences=getSharedPreferences("cn.lltw.nodelist_preferences",MODE_PRIVATE);
+        String username=preferences.getString("profile_username","username_undefined");
+        String email=preferences.getString("profile_email","email_undefined");
+
         nav_username.setText(username);
         nav_email.setText(email);
+
         getFragmentManager().beginTransaction().replace(R.id.main_content,new ListFragment()).commit();
-        //TODO:将野狗中的个人信息（用户名，邮箱，等）存入SharedPreference中
+
     }
 
     private void initialNotLoginView(){
         //判断为没有登陆
-        //TODO:修改为case写法点击头像图片以及下面的TextView都跳转到LoginActivity
+
         avatar_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
