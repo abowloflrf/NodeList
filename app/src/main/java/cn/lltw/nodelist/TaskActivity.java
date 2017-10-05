@@ -39,8 +39,8 @@ public class TaskActivity extends AppCompatActivity {
     String listKey;
     String uid;
     SyncReference ref;
-    TaskAdapter adapter;
-    TaskCompleteAdapter taskCompleteAdapter;
+    public TaskAdapter adapter;
+    public TaskCompleteAdapter taskCompleteAdapter;
     List<NodeTask> mNodeTask = new ArrayList<>();
     List<NodeTask> mNodeTaskCompleted = new ArrayList<>();
     private static final String TAG = "TaskActivity";
@@ -86,6 +86,7 @@ public class TaskActivity extends AppCompatActivity {
                         Log.d(TAG, "onDataChange: " + nodeTask.getName());
                     }
                     adapter.notifyDataSetChanged();
+                    taskCompleteAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -98,13 +99,13 @@ public class TaskActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.task_recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new TaskAdapter(mNodeTask);
+        adapter = new TaskAdapter(mNodeTask, listKey, this);
         recyclerView.setAdapter(adapter);
 
         RecyclerView recyclerViewComplete = (RecyclerView) findViewById(R.id.task_complete_recycler_view);
         LinearLayoutManager linearLayoutManagerComplete = new LinearLayoutManager(this);
         recyclerViewComplete.setLayoutManager(linearLayoutManagerComplete);
-        taskCompleteAdapter = new TaskCompleteAdapter(mNodeTaskCompleted);
+        taskCompleteAdapter = new TaskCompleteAdapter(mNodeTaskCompleted, listKey, this);
         recyclerViewComplete.setAdapter(taskCompleteAdapter);
     }
 
