@@ -28,7 +28,7 @@
             android:maxEms="8"
             android:ellipsize="end"
             android:textSize="20sp"
-            android:textColor="@android:color/primary_text_light"/>
+            android:textColor="@color/colorAccent"/>
     </RelativeLayout>
 
 

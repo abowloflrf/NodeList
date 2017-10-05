@@ -10,12 +10,12 @@ public class NodeTask {
     private String name;
     private String repeat;
     private String dueTime;
-    private String remark;
+    private String describe;
 
-    public NodeTask(String name, String remark, String key) {
+    public NodeTask(String name, String describe, String key) {
         this.name = name;
         this.key = key;
-        this.remark = remark;
+        this.describe = describe;
     }
 
     public void setKey(String key) {
@@ -58,11 +58,11 @@ public class NodeTask {
         return repeat;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setDescribe(String describe) {
+        this.describe = describe;
     }
 
-    public String getRemark() {
-        return remark;
+    public String getDescribe() {
+        return describe;
     }
 }

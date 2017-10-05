@@ -40,7 +40,9 @@ public class TaskActivity extends AppCompatActivity {
     String uid;
     SyncReference ref;
     TaskAdapter adapter;
+    TaskCompleteAdapter taskCompleteAdapter;
     List<NodeTask> mNodeTask = new ArrayList<>();
+    List<NodeTask> mNodeTaskCompleted = new ArrayList<>();
     private static final String TAG = "TaskActivity";
 
     @Override
@@ -66,11 +68,21 @@ public class TaskActivity extends AppCompatActivity {
                     Iterator iter = dataSnapshot.getChildren().iterator();
                     while (iter.hasNext()) {
                         DataSnapshot data = (DataSnapshot) iter.next();
+                        String taskKey = (String) data.getKey();
                         String taskName = (String) data.child("name").getValue();
                         String taskDescribe = (String) data.child("describe").getValue();
-                        String taskKey = (String) data.getKey();
+                        String taskDueTime = (String) data.child("dueTime").getValue();
+                        String taskRepeat = (String) data.child("repeat").getValue();
+                        boolean taskComplete = (boolean) data.child("complete").getValue();
                         NodeTask nodeTask = new NodeTask(taskName, taskDescribe, taskKey);
-                        mNodeTask.add(0, nodeTask);
+                        nodeTask.setComplete(taskComplete);
+                        nodeTask.setDueTime(taskDueTime);
+                        nodeTask.setRepeat(taskRepeat);
+                        if (taskComplete) {
+                            mNodeTaskCompleted.add(0, nodeTask);
+                        } else {
+                            mNodeTask.add(0, nodeTask);
+                        }
                         Log.d(TAG, "onDataChange: " + nodeTask.getName());
                     }
                     adapter.notifyDataSetChanged();
@@ -88,6 +100,12 @@ public class TaskActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new TaskAdapter(mNodeTask);
         recyclerView.setAdapter(adapter);
+
+        RecyclerView recyclerViewComplete = (RecyclerView) findViewById(R.id.task_complete_recycler_view);
+        LinearLayoutManager linearLayoutManagerComplete = new LinearLayoutManager(this);
+        recyclerViewComplete.setLayoutManager(linearLayoutManagerComplete);
+        taskCompleteAdapter = new TaskCompleteAdapter(mNodeTaskCompleted);
+        recyclerViewComplete.setAdapter(taskCompleteAdapter);
     }
 
     @Override
@@ -135,6 +153,9 @@ public class TaskActivity extends AppCompatActivity {
         HashMap<String,Object> task=new HashMap<>();
         task.put("name", taskName);
         task.put("describe", taskRemark);
+        task.put("repeat", "");
+        task.put("complete", false);
+        task.put("dueTime", "");
         //修改了添加任务的方式，避免了自动生成，使得任务的编号能够自己控制
         ref.push().setValue(task, new SyncReference.CompletionListener() {
             @Override
@@ -144,6 +165,9 @@ public class TaskActivity extends AppCompatActivity {
                 } else {
                     String taskKey = syncReference.getKey();
                     final NodeTask nodeTask = new NodeTask(taskName, taskRemark, taskKey);
+                    nodeTask.setComplete(false);
+                    nodeTask.setDueTime("");
+                    nodeTask.setRepeat("");
                     mNodeTask.add(0, nodeTask);
                     adapter.notifyDataSetChanged();
                 }
