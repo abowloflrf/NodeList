@@ -84,6 +84,7 @@ public class TaskCompleteAdapter extends RecyclerView.Adapter<TaskCompleteAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         NodeTask nodeTask= mNodeTaskComplete.get(position);
         holder.nodetaskName.setText(nodeTask.getName());
+        holder.nodetaskCompleted.setChecked(true);
     }
 
     @Override
