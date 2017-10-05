@@ -33,10 +33,10 @@ import java.util.List;
 import cn.lltw.nodelist.Model.NodeTask;
 
 public class TaskActivity extends AppCompatActivity {
-    static int taskSeq;
-    int listID;
+
     WilddogAuth auth;
     WilddogUser user;
+    String listKey;
     String uid;
     SyncReference ref;
     TaskAdapter adapter;
@@ -50,28 +50,27 @@ public class TaskActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        taskSeq = 0;
         String testTitle = bundle.getString("listName");
-        listID = bundle.getInt("listID");
+        listKey = bundle.getString("listKey");
         // 改变Title为清单名称
-        this.setTitle((CharSequence) (testTitle + listID));
+        this.setTitle((CharSequence) (testTitle + listKey));
 
         auth = WilddogAuth.getInstance();
         user = auth.getCurrentUser();
         uid = user.getUid();
-        ref = WilddogSync.getInstance().getReference("users/" + uid + "/lists/" + listID + "/tasks");
-        System.out.println(ref);
+        ref = WilddogSync.getInstance().getReference("users/" + uid + "/lists/" + listKey + "/tasks");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
                     Iterator iter = dataSnapshot.getChildren().iterator();
-                    taskSeq = (int)dataSnapshot.getChildrenCount();
                     while (iter.hasNext()) {
                         DataSnapshot data = (DataSnapshot) iter.next();
-                        String task_name = (String) data.child("name").getValue();
-                        NodeTask nodeTask = new NodeTask(task_name);
-                        mNodeTask.add(nodeTask);
+                        String taskName = (String) data.child("name").getValue();
+                        String taskDescribe = (String) data.child("describe").getValue();
+                        String taskKey = (String) data.getKey();
+                        NodeTask nodeTask = new NodeTask(taskName, taskDescribe, taskKey);
+                        mNodeTask.add(0, nodeTask);
                         Log.d(TAG, "onDataChange: " + nodeTask.getName());
                     }
                     adapter.notifyDataSetChanged();
@@ -128,23 +127,22 @@ public class TaskActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void createTask(String taskName, String taskRemark) {
+    private void createTask(final String taskName, final String taskRemark) {
         //根据新建参数构造一个NodeList对象
-        final NodeTask nodeTask=new NodeTask(taskName, taskRemark);
         HashMap<String,Object> task=new HashMap<>();
         task.put("name", taskName);
         task.put("describe", taskRemark);
-        ref= WilddogSync.getInstance().getReference("users/"+uid+"/lists/" + listID + "/tasks/" + taskSeq);
         //修改了添加任务的方式，避免了自动生成，使得任务的编号能够自己控制
-        ref.setValue(task, new SyncReference.CompletionListener() {
+        ref.push().setValue(task, new SyncReference.CompletionListener() {
             @Override
             public void onComplete(SyncError syncError, SyncReference syncReference) {
                 if (syncError!=null) {
                     Toast.makeText(getApplicationContext(), "Failed:"+syncError.getErrCode(), Toast.LENGTH_SHORT).show();
                 } else {
-                    mNodeTask.add(nodeTask);
+                    String taskKey = syncReference.getKey();
+                    final NodeTask nodeTask = new NodeTask(taskName, taskRemark, taskKey);
+                    mNodeTask.add(0, nodeTask);
                     adapter.notifyDataSetChanged();
-                    taskSeq += 1;
                 }
             }
         });

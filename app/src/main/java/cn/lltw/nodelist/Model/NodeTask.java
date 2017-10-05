@@ -6,18 +6,24 @@ package cn.lltw.nodelist.Model;
 
 public class NodeTask {
     private boolean complete;
+    private String key;
     private String name;
     private String repeat;
     private String dueTime;
     private String remark;
 
-    public NodeTask(String name) {
+    public NodeTask(String name, String remark, String key) {
         this.name = name;
+        this.key = key;
+        this.remark = remark;
     }
 
-    public NodeTask(String name, String remark) {
-        this(name);
-        this.remark = remark;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public void setComplete(boolean complete) {

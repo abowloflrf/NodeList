@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -38,7 +39,6 @@ import cn.lltw.nodelist.Model.NodeList;
  */
 public class ListFragment extends Fragment {
 
-    static int listSeq;
     View view;
     WilddogAuth auth;
     WilddogUser user;
@@ -66,19 +66,15 @@ public class ListFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null){
                     Iterator iter=dataSnapshot.getChildren().iterator();
-                    listSeq = (int) dataSnapshot.getChildrenCount();
                     while (iter.hasNext()){
                         DataSnapshot data=(DataSnapshot) iter.next();
                         String list_name=(String)data.child("name").getValue();
                         String list_describe=(String)data.child("describe").getValue();
-                        NodeList node_list=new NodeList(list_name,list_describe);
-
-                        //修改了添加的顺序
-                        mNodeList.add(node_list);
-                        Log.d(TAG, "onDataChange: "+node_list.getName());
+                        String list_key=data.getKey();
+                        NodeList node_list=new NodeList(list_name,list_describe,list_key);
+                        mNodeList.add(0,node_list);
                     }
                     adapter.notifyDataSetChanged();
-
                 }
 
             }
@@ -99,7 +95,7 @@ public class ListFragment extends Fragment {
         RecyclerView recyclerView=(RecyclerView)view.findViewById(R.id.list_recycler_view);
         LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter=new ListAdapter(mContext, mNodeList);
+        adapter=new ListAdapter(mNodeList);
         recyclerView.setAdapter(adapter);
         fab=(FloatingActionButton)view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -130,27 +126,22 @@ public class ListFragment extends Fragment {
                 .show();
     }
 
-    public void createList(String name, final String des){
+    public void createList(final String name, final String des){
         //根据新建参数构造一个NodeList对象
-        final NodeList nodelist=new NodeList(name,des);
         HashMap<String,Object> list=new HashMap<>();
         list.put("name",name);
         list.put("describe",des);
-        //添加清单的序号为listSeq，回头可以自动索引
-        ref= WilddogSync.getInstance().getReference("users/"+uid+"/lists/" + listSeq);
-        //修改了添加清单的方式，避免了自动生成，使得清单的编号能够自己控制
-        ref.setValue(list, new SyncReference.CompletionListener() {
+        ref.push().setValue(list, new SyncReference.CompletionListener() {
             @Override
             public void onComplete(SyncError syncError, SyncReference syncReference) {
                 if (syncError!=null){
                     Toast.makeText(getContext(), "Failed:"+syncError.getErrCode(), Toast.LENGTH_SHORT).show();
                 }else{
                     //将新建的NodeList对象添加到列表中并刷新recyclerview
-
-                    //修改了添加的顺序-By WX
-                    mNodeList.add(nodelist);
+                    String key=syncReference.getKey();
+                    NodeList nodelist=new NodeList(name,des,key);
+                    mNodeList.add(0,nodelist);
                     adapter.notifyDataSetChanged();
-                    listSeq += 1;
                 }
             }
         });
