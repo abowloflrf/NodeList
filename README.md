@@ -9,8 +9,8 @@
 - ~~显示当前用户所有List~~
 - ~~新建List~~
 - ~~长按删除list~~
-- **点击相应的list进入新的activty展示当前list下所有的task，上面显示已完成下面显示未完成**
-- **新建task条目**
+- ~~点击相应的list进入新的activty展示当前list下所有的task~~，下面显示已完成上面显示未完成
+- ~~新建task条目~~
 - 点击task进入task详情页
     - task标题，备注
     - task提醒时间
