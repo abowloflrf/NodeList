@@ -90,7 +90,6 @@ public class TaskActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    //TODO:加上这两个方法了以后，返回键不能用了 =_=
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -104,6 +103,10 @@ public class TaskActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.add_task:
                 showCreateNewTaskDialog();
+                break;
+            case android.R.id.home:
+                finish();
+                break;
         }
         return true;
     }

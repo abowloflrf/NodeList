@@ -24,6 +24,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_task">Tasks</string>
+    <string name="activity_task_complete">已完成</string>
 
     <!-- Strings related to Settings -->
 
