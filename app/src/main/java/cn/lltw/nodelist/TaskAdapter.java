@@ -3,7 +3,6 @@ package cn.lltw.nodelist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     private String listKey;
     private TaskActivity taskActivity;
     private View view;
-    private SparseBooleanArray mCheckState = new SparseBooleanArray();
 
     public TaskAdapter(List<NodeTask> mNodeTask, String listKey, TaskActivity taskActivity) {
         this.mNodeTask = mNodeTask;
@@ -67,25 +65,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             }
         });
 
-
-
-//        holder.nodetaskComplete.setTag(position);
-
         holder.nodetaskComplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 int position = holder.getAdapterPosition();
-//                int pos = (int) compoundButton.getTag();
                 final NodeTask task = mNodeTask.get(position);
                 String taskKey = task.getKey();
                 if (isChecked) {
-//                    mCheckState.put(pos, true);
-//                    holder.nodetaskComplete.setChecked(true);
                     finishTask(taskKey, position);
                     Toast.makeText(view.getContext(), task.getName() + "选中" + position, Toast.LENGTH_SHORT).show();
                 } else {
-//                    mCheckState.delete(pos);
-//                    holder.nodetaskComplete.setChecked(false);
                     Toast.makeText(view.getContext(), "取消选中" + position, Toast.LENGTH_SHORT).show();
                 }
             }

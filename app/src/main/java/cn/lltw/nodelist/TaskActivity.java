@@ -55,7 +55,7 @@ public class TaskActivity extends AppCompatActivity {
         String testTitle = bundle.getString("listName");
         listKey = bundle.getString("listKey");
         // 改变Title为清单名称
-        this.setTitle((CharSequence) (testTitle + listKey));
+        this.setTitle((CharSequence) testTitle);
 
         auth = WilddogAuth.getInstance();
         user = auth.getCurrentUser();
