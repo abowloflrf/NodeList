@@ -45,6 +45,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cn.lltw.nodelist.MainActivity" />
         </activity>
+        <activity android:name=".TaskDetailActivity"></activity>
     </application>
 
 </manifest>

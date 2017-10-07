@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.wilddog.client.WilddogSync;
 import com.wilddog.wilddogauth.WilddogAuth;
 import com.wilddog.wilddogauth.model.WilddogUser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,10 +54,10 @@ public class TaskActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        String testTitle = bundle.getString("listName");
+        String listTitle = bundle.getString("listName");
         listKey = bundle.getString("listKey");
         // 改变Title为清单名称
-        this.setTitle((CharSequence) testTitle);
+        this.setTitle((CharSequence) listTitle);
 
         auth = WilddogAuth.getInstance();
         user = auth.getCurrentUser();
@@ -101,12 +103,14 @@ public class TaskActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new TaskAdapter(mNodeTask, listKey, this);
         recyclerView.setAdapter(adapter);
+        registerForContextMenu(recyclerView);
 
         RecyclerView recyclerViewComplete = (RecyclerView) findViewById(R.id.task_complete_recycler_view);
         LinearLayoutManager linearLayoutManagerComplete = new LinearLayoutManager(this);
         recyclerViewComplete.setLayoutManager(linearLayoutManagerComplete);
         taskCompleteAdapter = new TaskCompleteAdapter(mNodeTaskCompleted, listKey, this);
         recyclerViewComplete.setAdapter(taskCompleteAdapter);
+//        registerForContextMenu(recyclerViewComplete);
     }
 
     @Override
@@ -121,7 +125,7 @@ public class TaskActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.add_task:
-                showCreateNewTaskDialog();
+                showCreateNewTaskDialog(R.layout.new_task_dialog, null, -1);
                 break;
             case android.R.id.home:
                 finish();
@@ -131,22 +135,57 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     //TODO:增加更多的可选项选项
-    private void showCreateNewTaskDialog() {
+    private void showCreateNewTaskDialog(int dialogLayout, final NodeTask nodeTask, final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.new_task_dialog, null);
-        final EditText taskName = (EditText)view.findViewById(R.id.dialog_task_name);
-        final EditText taskRemark = (EditText)view.findViewById(R.id.dialog_task_remark);
-        builder.setTitle("创建任务")
-                .setView(view)
-                .setPositiveButton("创建", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        createTask(taskName.getText().toString(), taskRemark.getText().toString());
-                    }
-                })
-                .setNegativeButton("取消",null)
-                .show();
+        View view = inflater.inflate(dialogLayout, null);
+        switch (dialogLayout) {
+            case R.layout.new_task_dialog:
+                final EditText taskName = (EditText)view.findViewById(R.id.dialog_task_name);
+                final EditText taskRemark = (EditText)view.findViewById(R.id.dialog_task_describe);
+                builder.setTitle("创建任务")
+                        .setView(view)
+                        .setPositiveButton("创建", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                createTask(taskName.getText().toString(), taskRemark.getText().toString());
+                            }
+                        })
+                        .setNegativeButton("取消",null)
+                        .show();
+                break;
+            case R.layout.task_describe_dialog:
+                final EditText taskNewDescribe = (EditText) view.findViewById(R.id.dialog_task_describe_edit);
+                taskNewDescribe.setText(nodeTask.getDescribe());
+                builder.setTitle("修改和查看备注")
+                        .setView(view)
+                        .setPositiveButton("修改", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                adapter.modifyDescribe(nodeTask.getKey(), position, taskNewDescribe.getText().toString());
+                            }
+                        })
+                        .setNegativeButton("返回",null)
+                        .show();
+                break;
+            case R.layout.task_due_time_dialog:
+                //TODO:得到选中时间
+                final CalendarView taskNewDueTimeView = (CalendarView) view.findViewById(R.id.dialog_task_calendar_edit);
+                final Long taskNewDueTime = taskNewDueTimeView.getDate();
+                final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                builder.setTitle("设置日期")
+                        .setView(view)
+                        .setPositiveButton("修改", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                adapter.modifyDescribe(nodeTask.getKey(), position, taskNewDescribe.getText().toString());
+                                Toast.makeText(getApplicationContext(), "" + simpleDateFormat.format(taskNewDueTime), Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("取消",null)
+                        .show();
+                break;
+        }
     }
 
     private void createTask(final String taskName, final String taskRemark) {
@@ -174,5 +213,48 @@ public class TaskActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        int position = -1;
+        NodeTask nodeTask;
+        try {
+            position = adapter.getPosition();
+            nodeTask = mNodeTask.get(position);
+        } catch (Exception e) {
+            Log.d(TAG, e.getLocalizedMessage(), e);
+            return super.onContextItemSelected(item);
+        }
+        switch (item.getItemId()) {
+            case 0:
+                Toast.makeText(getApplicationContext(), "完成了" + nodeTask.getName(), Toast.LENGTH_SHORT).show();
+                adapter.finishTask(nodeTask.getKey(), position);
+                break;
+            case 1:
+                // do your stuff
+                Toast.makeText(getApplicationContext(), "点击了1", Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                // do your stuff
+                Toast.makeText(getApplicationContext(), "点击了2", Toast.LENGTH_SHORT).show();
+                break;
+            case 3:
+                // do your stuff
+                Toast.makeText(getApplicationContext(), "点击了3", Toast.LENGTH_SHORT).show();
+                showCreateNewTaskDialog(R.layout.task_due_time_dialog, nodeTask, position);
+                break;
+            case 4:
+                // do your stuff
+                Toast.makeText(getApplicationContext(), "修改了" + nodeTask.getName() + "的备注", Toast.LENGTH_SHORT).show();
+                showCreateNewTaskDialog(R.layout.task_describe_dialog, nodeTask, position);
+                break;
+            case 5:
+                // do your stuff
+                Toast.makeText(getApplicationContext(), "删除了" + nodeTask.getName(), Toast.LENGTH_SHORT).show();
+                adapter.deleteTask(nodeTask.getKey(), position);
+                break;
+        }
+        return super.onContextItemSelected(item);
     }
 }
